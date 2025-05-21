@@ -13,19 +13,19 @@ If you just want to use TRAINSET and don't want to mess with deploying it, head 
 
 ``` bash
 # install dependencies
-npm install
+uv install
 
-# serve with hot reload at localhost:8080
-npm run dev
+# serve with hot reload at localhost:8050
+uv run
 
 # build for production with minification
-npm run build
+uv build
 
 # testing script for serving prod build locally
-npm run start
+uv start
 
 # build for production and view the bundle analyzer report
-npm run build --report
+uv build --report
 
 # pushing to heroku
 
@@ -38,3 +38,23 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 ## Funding Support
 
 The development of TRAINSET was funded by the [NIH Clean Cooking Implementation Science Network](https://www.fic.nih.gov/About/Staff/Policy-Planning-Evaluation/Pages/clean-cooking-implementation-science-network.aspx) with funding from the [NIH Common Fund for Global Health](https://commonfund.nih.gov/globalhealth). The development team and cookstove community are grateful for this support.
+
+## Python Version
+
+The repository now includes a Python version of the graphical tool for labeling time series data. The main functionality is implemented in Python using Flask for the web interface.
+
+## CSV File Format
+
+The CSV file should have four comma-delimited columns with the header: `series, timestamp, value, label`. The `series` column should contain unique names for the time series. The `timestamp` column should contain timestamps in ISO8601 format. The `value` column should contain numeric scalar values. The `label` column should contain integer representations of booleans or other valid labels. The CSV data should be correctly formatted before processing it further.
+
+## Hotkeys and Keyboard Shortcuts
+
+The application supports the following hotkeys and keyboard shortcuts:
+
+* Click a point to toggle it as labeled
+* Click & Drag over a selection of points to label them
+* SHIFT + Click & Drag over a selection of points to unlabel them
+* → or ← : pan
+* SHIFT + → or ← : fast pan
+* ↑ or ↓: zoom
+* Click & Drag the bottom context bar to adjust focus region
