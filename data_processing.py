@@ -45,3 +45,25 @@ def process_csv(file_path):
     else:
         print("CSV file processing failed")
         return None
+
+def validate_csv_format(file_path):
+    try:
+        # Read CSV file in chunks using Dask
+        df = dd.read_csv(file_path)
+
+        # Check if the CSV file has the format: `series, timestamp, value, label`
+        if list(df.columns) == ['series', 'timestamp', 'value', 'label']:
+            return validate_csv(file_path)
+
+        # Check if the CSV file has the format: `datetime,indoor_temperature_indoor_temperature_1,valves_valve_position,setpoint_room_regulation_RoomControl_actual_value,brightness_brightness,CO2_CO2,rel_hum_rel_hum,motion_presence_motion`
+        elif list(df.columns) == ['datetime', 'indoor_temperature_indoor_temperature_1', 'valves_valve_position', 'setpoint_room_regulation_RoomControl_actual_value', 'brightness_brightness', 'CO2_CO2', 'rel_hum_rel_hum', 'motion_presence_motion']:
+            # Perform any additional processing or validation for this format here
+            print("CSV file with the second format processed successfully")
+            return df
+
+        else:
+            raise ValueError("CSV file must have one of the specified formats")
+
+    except Exception as e:
+        print(f"Error validating CSV file format: {e}")
+        return None
