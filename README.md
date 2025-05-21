@@ -1,40 +1,82 @@
-# TRAINSET
+# Python TRAINSET - Time Series Labeling Tool
 
-TRAINSET is a graphical tool for labeling time series data. You can upload multiple series and apply one or many labels. In the GIF below, `series_a` is being labled with `bar` and `biz` labels while `series_b` is serving as a reference.
+A Python-based graphical tool for labeling time series data, inspired by the original TRAINSET application. This version is built using Flask, Dash, and Plotly.
 
-![TRAINSET labeling GIF](https://user-images.githubusercontent.com/8713574/112393077-b1832d80-8cb7-11eb-811b-0a7200be658d.gif)
+## Features
 
+*   Upload time series data via CSV files.
+*   Interactive visualization of time series.
+*   Select active and reference series for display.
+*   Create, assign, and manage labels for data points.
+*   Label individual points by clicking.
+*   Label multiple points by selecting a region (box/lasso select).
+*   Export labeled data back to a CSV file.
+*   User-friendly interface with on-screen instructions.
 
-## Hosted Version
+## Tech Stack
 
-If you just want to use TRAINSET and don't want to mess with deploying it, head to the [hosted version](https://trainset.geocene.com)
+*   Python
+*   Flask (for web framework and file uploads)
+*   Dash (for building the interactive dashboard)
+*   Plotly (for charting)
+*   Pandas (for data manipulation)
+*   Pytest (for unit testing)
 
-## Build Setup
+## Setup Instructions
 
-``` bash
-# install dependencies
-npm install
+### Prerequisites
 
-# serve with hot reload at localhost:8080
-npm run dev
+*   Python 3.7+
+*   pip (Python package installer)
 
-# build for production with minification
-npm run build
+### Installation
 
-# testing script for serving prod build locally
-npm run start
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository_url> # Replace <repository_url> with the actual URL
+    cd python-trainset # Or your project's directory name
+    ```
 
-# build for production and view the bundle analyzer report
-npm run build --report
+2.  **Create and activate a virtual environment (recommended):**
+    ```bash
+    python -m venv venv
+    # On Windows
+    # venv\Scripts\activate
+    # On macOS/Linux
+    # source venv/bin/activate
+    ```
 
-# pushing to heroku
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-git push heroku master
+## Running the Application
+
+1.  **Start the Flask development server:**
+    ```bash
+    python app.py
+    ```
+
+2.  **Access the application:**
+    *   **To upload data:** Open your web browser and go to `http://127.0.0.1:5000/`.
+    *   **Main Labeling Interface:** After uploading data, you will be redirected to `http://127.0.0.1:5000/dash/`. You can also access this URL directly if data has been previously uploaded in the current session.
+
+## Usage
+
+Once the application is running and data is loaded:
+
+1.  Follow the on-screen instructions provided within the application for detailed steps on loading data, selecting series, managing labels, labeling data points, and exporting your results.
+2.  **Expected CSV Format:** The input CSV file should contain columns typically named `time`, `series`, `val`. An optional `label` column can be included if you have pre-existing labels.
+    *   `time`: Timestamp data (parsable by Pandas, e.g., `YYYY-MM-DD HH:MM:SS`).
+    *   `series`: Name or identifier for the time series.
+    *   `val`: Numerical value of the series at the given time.
+    *   `label` (optional): Text label associated with the data point.
+
+## Running Tests
+
+To run the unit tests for the backend data handling:
+
+```bash
+pytest tests/
 ```
-see [here](https://devcenter.heroku.com/articles/git#deploying-code).
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
-
-## Funding Support
-
-The development of TRAINSET was funded by the [NIH Clean Cooking Implementation Science Network](https://www.fic.nih.gov/About/Staff/Policy-Planning-Evaluation/Pages/clean-cooking-implementation-science-network.aspx) with funding from the [NIH Common Fund for Global Health](https://commonfund.nih.gov/globalhealth). The development team and cookstove community are grateful for this support.

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Python TRAINSET</title>
+</head>
+<body>
+    <h1>Welcome to Python TRAINSET</h1>
+    <p>Upload your CSV file to start analyzing your time series data.</p>
+    <a href="{{ url_for('upload_file') }}">Upload CSV</a>
+    <br>
+    <p>If you have already uploaded data, you can view the dashboard.</p>
+    <a href="{{ url_for('dash_app.index') }}">View Dashboard</a>
+</body>
+</html>
