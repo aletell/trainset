@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Timeline Clone</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .context rect.selection {
+      fill: rgba(0,0,0,0.2);
+    }
+    .annotation-band {
+      fill-opacity:0.3;
+    }
+  </style>
+</head>
+<body class="bg-[#121416] text-white font-sans">
+  <div class="p-10 space-y-4">
+    <h1 class="text-2xl font-bold">Local Timeline Clone</h1>
+    <p class="text-sm text-[#a2abb3]">
+      Use the mouse wheel to zoom. Drag in the overview bar to change the view.
+      Arrow keys pan the selection while <kbd>Shift</kbd>+Arrow resizes it.
+      Press <kbd>Ctrl</kbd>+&uarr; to label the selected region as occupied and
+      <kbd>Ctrl</kbd>+&darr; to mark it unoccupied.
+    </p>
+    <div class="flex gap-4 items-center">
+      <button id="export" class="rounded bg-[#2c3135] px-4 py-2 text-sm font-bold">Export CSV</button>
+      <label class="flex items-center gap-1"><input id="clip" type="checkbox" class="h-4 w-4" /> Clip outliers</label>
+      <label class="flex items-center gap-1">Y Max <input id="ymax" type="number" class="bg-[#2c3135] w-20 p-1 rounded" /></label>
+    </div>
+    <div class="flex gap-4" id="series-chooser"></div>
+    <div id="chart"></div>
+  </div>
+<script>
+// set dimensions
+const margin = {top:20,right:20,bottom:110,left:50},
+      margin2 = {top:260,right:20,bottom:30,left:50},
+      width = 800 - margin.left - margin.right,
+      height = 300 - margin.top - margin.bottom,
+      height2 = 300 - margin2.top - margin2.bottom;
+
+const svg = d3.select('#chart').append('svg')
+  .attr('width', width + margin.left + margin.right)
+  .attr('height', 300);
+
+const gMain = svg.append('g')
+  .attr('transform', `translate(${margin.left},${margin.top})`);
+const gContext = svg.append('g')
+  .attr('class','context')
+  .attr('transform', `translate(${margin2.left},${margin2.top})`);
+
+const x = d3.scaleTime().range([0,width]),
+      x2 = d3.scaleTime().range([0,width]),
+      y = d3.scaleLinear().range([height,0]),
+      y2 = d3.scaleLinear().range([height2,0]);
+
+const xAxis = d3.axisBottom(x),
+      xAxis2 = d3.axisBottom(x2),
+      yAxis = d3.axisLeft(y);
+
+let baseExtentY = null;
+
+const brush = d3.brushX()
+  .extent([[0,0],[width,height2]])
+  .on('brush end', brushed);
+
+function makeLine(scaleX, scaleY, key){
+  return d3.line()
+    .x(d => scaleX(d.timestamp))
+    .y(d => scaleY(d[key]));
+}
+
+function loadData(){
+  const clip = document.getElementById('clip').checked ? '1' : '0';
+  return fetch(`data?clip=${clip}`).then(r=>r.json()).then(data => {
+    data.forEach(d => { d.timestamp = new Date(d.timestamp); });
+    return data;
+  });
+}
+
+let raw = [];
+loadData().then(data => {
+  raw = data;
+  raw.sort((a,b)=>a.timestamp-b.timestamp);
+
+  const LOCAL_KEY = 'timeline_labels';
+  function loadSaved(){
+    const ls = localStorage.getItem(LOCAL_KEY);
+    if(ls){
+      try{ const arr = JSON.parse(ls); if(arr.length===raw.length) arr.forEach((v,i)=>raw[i].label1=v); }catch(e){}
+    }
+    fetch('annotations').then(r=>r.json()).then(arr=>{ if(Array.isArray(arr) && arr.length===raw.length){ arr.forEach((v,i)=>raw[i].label1=v); updateBands(); } });
+  }
+
+  function saveLabels(){
+    const arr = raw.map(d=>d.label1);
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(arr));
+    fetch('annotations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(arr)}).catch(()=>{});
+  }
+
+  const seriesKeys = ['series1','series2','series3'];
+  const colors = ['#ff7f0e','#2ca02c','#1f77b4'];
+
+  const extentY = [
+    d3.min(raw, r => d3.min(seriesKeys, k => r[k])),
+    d3.max(raw, r => d3.max(seriesKeys, k => r[k]))
+  ];
+  baseExtentY = extentY.slice();
+
+  x.domain(d3.extent(raw, d=>d.timestamp));
+  y.domain(extentY);
+  x2.domain(x.domain());
+  y2.domain(y.domain());
+
+  let annotationBands = gMain.append('g');
+  function updateBands(){
+    const annotations = buildBands(raw.map(d=>({timestamp:d.timestamp,label:d.label1})));
+    const bands = annotationBands.selectAll('rect').data(annotations);
+    bands.enter().append('rect')
+      .attr('class','annotation-band')
+      .merge(bands)
+      .attr('x', d=>x(d.start))
+      .attr('width', d=>x(d.end)-x(d.start))
+      .attr('y',0)
+      .attr('height',height)
+      .attr('fill', d=>d.label==='occupied' ? 'red' : 'green');
+    bands.exit().remove();
+  }
+  updateBands();
+  loadSaved();
+
+  const chooser = d3.select('#series-chooser');
+  const active = new Set(seriesKeys);
+
+  chooser.selectAll('label')
+    .data(seriesKeys)
+    .enter().append('label')
+    .attr('class','flex items-center gap-1')
+    .each(function(key,i){
+      d3.select(this)
+        .append('input')
+        .attr('type','checkbox')
+        .attr('checked',true)
+        .on('change',function(){
+          if(this.checked) active.add(key); else active.delete(key);
+          update();
+        });
+      d3.select(this).append('span').text(`Series ${i+1}`);
+    });
+
+  const lines = gMain.selectAll('path.series')
+    .data(seriesKeys)
+    .enter().append('path')
+    .attr('class','series')
+    .attr('fill','none')
+    .attr('stroke', (d,i)=>colors[i])
+    .attr('stroke-width',1.5);
+
+  const lines2 = gContext.selectAll('path.series')
+    .data(seriesKeys)
+    .enter().append('path')
+    .attr('class','series')
+    .attr('fill','none')
+    .attr('stroke',(d,i)=>colors[i])
+    .attr('stroke-width',1.5);
+
+  gMain.append('g').attr('class','axis x').attr('transform',`translate(0,${height})`).call(xAxis);
+  gMain.append('g').attr('class','axis y').call(yAxis);
+
+  gContext.append('g').attr('class','axis x').attr('transform',`translate(0,${height2})`).call(xAxis2);
+
+  gContext.append('g').attr('class','x brush').call(brush)
+    .call(brush.move, x.range());
+
+  const zoom = d3.zoom()
+    .scaleExtent([1,20])
+    .translateExtent([[0,0],[width,height]])
+    .extent([[0,0],[width,height]])
+    .on('zoom', zoomed);
+
+  svg.call(zoom);
+
+  d3.select('#export').on('click', () => {
+    fetch('export').then(r=>r.text()).then(csv => {
+      const blob = new Blob([csv],{type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'annotations.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+  });
+
+  document.getElementById('clip').addEventListener('change', () => {
+    loadData().then(data => {
+      raw = data;
+      raw.sort((a,b)=>a.timestamp-b.timestamp);
+      baseExtentY = [
+        d3.min(raw, r => d3.min(seriesKeys, k => r[k])),
+        d3.max(raw, r => d3.max(seriesKeys, k => r[k]))
+      ];
+      x.domain(d3.extent(raw,d=>d.timestamp));
+      x2.domain(x.domain());
+      update();
+      updateBands();
+    });
+  });
+
+  document.getElementById('ymax').addEventListener('input', update);
+
+  window.addEventListener('beforeunload', saveLabels);
+
+  d3.select(window).on('keydown', e => {
+    if(e.key.startsWith('Arrow')){
+      e.preventDefault();
+      const step = (x.domain()[1] - x.domain()[0]) * 0.05;
+      let [start,end] = brushSelection || x.domain();
+      if(e.ctrlKey && (e.key==='ArrowUp' || e.key==='ArrowDown')){
+        const val = e.key==='ArrowUp' ? 'occupied' : 'unoccupied';
+        raw.forEach(d=>{ if(d.timestamp>=start && d.timestamp<=end) d.label1=val; });
+        saveLabels();
+        updateBands();
+        return;
+      }
+      if(e.shiftKey){
+        if(e.key==='ArrowRight') end += step;
+        if(e.key==='ArrowLeft') start -= step;
+      }else{
+        if(e.key==='ArrowRight'){ start += step; end += step; }
+        if(e.key==='ArrowLeft'){ start -= step; end -= step; }
+      }
+      brush.move(gContext.select('.brush'), [x2(start), x2(end)]);
+    }
+  });
+
+  let brushSelection = null;
+
+  function update(){
+    const yMaxInput = document.getElementById('ymax');
+    const maxVal = parseFloat(yMaxInput.value);
+    if(!isNaN(maxVal)){
+      y.domain([baseExtentY[0], maxVal]);
+    }else{
+      y.domain(baseExtentY);
+    }
+    y2.domain(y.domain());
+    lines.each(function(key){
+      d3.select(this)
+        .style('display', active.has(key) ? null : 'none')
+        .datum(raw)
+        .attr('d', makeLine(x,y,key));
+    });
+    lines2.each(function(key){
+      d3.select(this)
+        .style('display', active.has(key) ? null : 'none')
+        .datum(raw)
+        .attr('d', makeLine(x2,y2,key));
+    });
+    updateBands();
+    gMain.select('.axis.x').call(xAxis);
+  }
+  update();
+
+  function brushed(event) {
+    if(event.selection){
+      brushSelection = event.selection.map(x2.invert);
+      x.domain(brushSelection);
+      update();
+    }
+  }
+
+  function zoomed(event){
+    const zx = event.transform.rescaleX(x2);
+    x.domain(zx.domain());
+    brushSelection = x.domain();
+    gContext.select('.brush').call(brush.move, brushSelection.map(x2));
+    update();
+  }
+
+  function buildBands(data){
+    const bands=[];
+    let current=null;
+    data.forEach(d=>{
+      if(!current || current.label!==d.label){
+        if(current){current.end=d.timestamp; bands.push(current);}
+        current={start:d.timestamp,label:d.label};
+      }
+    });
+    if(current){current.end=data[data.length-1].timestamp; bands.push(current);}
+    return bands;
+  }
+});
+</script>
+</body>
+</html>
+
