@@ -33,6 +33,17 @@ git push heroku master
 ```
 see [here](https://devcenter.heroku.com/articles/git#deploying-code).
 
+## CSV Formats
+
+TRAINSET accepts two input layouts:
+
+1. **Wide format** – a `timestamp` column followed by one column per series.
+   Optional label columns like `series1_label` are paired with each series.
+2. **TRAINSET format** – rows contain `series,timestamp,value,label`.
+
+The provided parser detects either layout automatically and normalizes the data
+before loading.
+
 ## Deploying to Netlify
 
 1. Commit your changes to a Git repository (GitHub, GitLab, etc.).

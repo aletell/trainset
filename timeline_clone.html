@@ -78,10 +78,28 @@ function loadData(){
   });
 }
 
+function pivotData(arr){
+  const byTime = d3.group(arr, d=>d.timestamp.getTime());
+  const series = Array.from(new Set(arr.map(d=>d.series)));
+  const rows = [];
+  byTime.forEach((vals, t) => {
+    const row = { timestamp: new Date(+t) };
+    vals.forEach(v => {
+      row[v.series] = v.value;
+      if(!row.label1 && v.label) row.label1 = v.label;
+    });
+    rows.push(row);
+  });
+  rows.sort((a,b)=>a.timestamp-b.timestamp);
+  return { rows, series };
+}
+
 let raw = [];
+let seriesKeys = [];
 loadData().then(data => {
-  raw = data;
-  raw.sort((a,b)=>a.timestamp-b.timestamp);
+  const pivot = pivotData(data);
+  raw = pivot.rows;
+  seriesKeys = pivot.series;
 
   const LOCAL_KEY = 'timeline_labels';
   function loadSaved(){
@@ -98,8 +116,7 @@ loadData().then(data => {
     fetch('annotations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(arr)}).catch(()=>{});
   }
 
-  const seriesKeys = ['series1','series2','series3'];
-  const colors = ['#ff7f0e','#2ca02c','#1f77b4'];
+  const colors = d3.schemeCategory10;
 
   const extentY = [
     d3.min(raw, r => d3.min(seriesKeys, k => r[k])),
@@ -196,14 +213,41 @@ loadData().then(data => {
 
   document.getElementById('clip').addEventListener('change', () => {
     loadData().then(data => {
-      raw = data;
-      raw.sort((a,b)=>a.timestamp-b.timestamp);
+      const pv = pivotData(data);
+      raw = pv.rows;
+      seriesKeys = pv.series;
+      active.clear();
+      seriesKeys.forEach(k => active.add(k));
       baseExtentY = [
         d3.min(raw, r => d3.min(seriesKeys, k => r[k])),
         d3.max(raw, r => d3.max(seriesKeys, k => r[k]))
       ];
       x.domain(d3.extent(raw,d=>d.timestamp));
       x2.domain(x.domain());
+      chooser.selectAll('*').remove();
+      chooser.selectAll('label')
+        .data(seriesKeys)
+        .enter().append('label')
+        .attr('class','flex items-center gap-1')
+        .each(function(key,i){
+          d3.select(this)
+            .append('input')
+            .attr('type','checkbox')
+            .attr('checked',true)
+            .on('change',function(){
+              if(this.checked) active.add(key); else active.delete(key); update(); });
+          d3.select(this).append('span').text(`Series ${i+1}`);
+        });
+      lines.data(seriesKeys).enter().append('path')
+        .attr('class','series')
+        .attr('fill','none')
+        .attr('stroke',(d,i)=>colors[i])
+        .attr('stroke-width',1.5);
+      lines2.data(seriesKeys).enter().append('path')
+        .attr('class','series')
+        .attr('fill','none')
+        .attr('stroke',(d,i)=>colors[i])
+        .attr('stroke-width',1.5);
       update();
       updateBands();
     });

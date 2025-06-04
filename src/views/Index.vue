@@ -68,54 +68,28 @@ export default {
       }
       var fileInput = document.getElementById("upload-file").files.item(0), fileText;
       var filename = fileInput.name.split('.csv')[0];
-      var id = 0;
       var reader = new FileReader();
       var seriesList = new Set(), labelList = new Set(), plotDict = [], headerStr;
-      reader.readAsBinaryString(fileInput);
+      reader.readAsText(fileInput);
       reader.onloadend = () => {
-        fileText = $.csv.toArrays(reader.result);
-        headerStr = fileText[0].toString();
-        for (var i = 1; i < fileText.length ; i++) {
-          var dateMatches = fileText[i][1].match(/^((\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})(.(\d{3}))?(([+-](\d{2})\:?(\d{2}))|Z))$/)
-          var labelMatches = fileText[i][3].match(/^[a-zA-Z0-9_-]{0,16}$/)
-          var parsedValue = Number(fileText[i][2]).toString()
-          if (fileText[i].length === 4 
-            && dateMatches
-            && labelMatches
-            && parsedValue !== Number.NaN) {
-            var date = DateTime.fromISO(fileText[i][1], {setZone: true});
-            var series = fileText[i][0];
-            seriesList.add(series);
-            if (fileText[i][3]) {
-              labelList.add(fileText[i][3]);
-            }
-            plotDict.push({
-              'id': id.toString(),
-              'val': parsedValue,
-              'time': date,
-              'series': series,
-              'label': fileText[i][3]
-            });
-            id++;
-          } else {
-            if (!(fileText[i].length === 4)) {
-              console.log('line parse error in line ' + (i+1));
-            } else if (!labelMatches) {
-              console.log('label parse error in line ' + (i+1));
-            } else if (parsedValue === Number.NaN) {
-              console.log('value parse error in line ' + (i+1));
-            } else {
-              console.log('date parse error in line ' + (i+1));
-            }
-            this.error();
-            break;
-          }
-        }
-        // if there was no error parsing csv
+        headerStr = reader.result.split(/\r?\n/)[0];
+        const parseCsv = require('@/utils/parseCsv');
+        const parsed = parseCsv(reader.result);
+        parsed.forEach((row, idx) => {
+          const date = DateTime.fromJSDate(row.timestamp);
+          seriesList.add(row.series);
+          if (row.label) labelList.add(row.label);
+          plotDict.push({
+            id: idx.toString(),
+            val: row.value.toString(),
+            time: date,
+            series: row.series,
+            label: row.label
+          });
+        });
         if (!this.errorUpload) {
           seriesList = Array.from(seriesList);
           labelList = Array.from(labelList);
-
           this.$router.push({
             name: 'labeler',
             params: {
