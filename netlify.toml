@@ -1,0 +1,26 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+  [build.environment]
+    NODE_VERSION = "16"
+
+[[redirects]]
+  from = "/annotations"
+  to = "/.netlify/functions/annotations"
+  status = 200
+
+[[redirects]]
+  from = "/data"
+  to = "/.netlify/functions/data"
+  status = 200
+
+[[redirects]]
+  from = "/export"
+  to = "/.netlify/functions/export"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

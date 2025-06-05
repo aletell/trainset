@@ -1,59 +1,114 @@
 <template>
-  <BaseView class="container">
-    <template v-slot:main-content>
-      <div>
-        <h3 class="title">Welcome to TRAINSET</h3>
-        <button type="button" class="btn btn-lg btn-outline-danger upload" id="upload" @click="upload">Upload Data</button>
-        <input type="file" id="upload-file" ref="fileInput" class="fileCheck" @change="fileCheck">
-        <a id="sampleCSV" href="/static/files/sample_trainset.csv" download>sample CSV</a>
+  <div class="relative flex size-full min-h-screen flex-col bg-[#111518] overflow-x-hidden" style="font-family: Inter, 'Noto Sans', sans-serif;">
+    <div class="layout-container flex h-full grow flex-col">
+      <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#283139] px-10 py-3">
+        <div class="flex items-center gap-4 text-white">
+          <div class="size-4">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M24 18.4228L42 11.475V34.3663C42 34.7796 41.7457 35.1504 41.3601 35.2992L24 42V18.4228Z" fill="currentColor" />
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M24 8.18819L33.4123 11.574L24 15.2071L14.5877 11.574L24 8.18819ZM9 15.8487L21 20.4805V37.6263L9 32.9945V15.8487ZM27 37.6263V20.4805L39 15.8487V32.9945L27 37.6263ZM25.354 2.29885C24.4788 1.98402 23.5212 1.98402 22.646 2.29885L4.98454 8.65208C3.7939 9.08038 3 10.2097 3 11.475V34.3663C3 36.0196 4.01719 37.5026 5.55962 38.098L22.9197 44.7987C23.6149 45.0671 24.3851 45.0671 25.0803 44.7987L42.4404 38.098C43.9828 37.5026 45 36.0196 45 34.3663V11.475C45 10.2097 44.2061 9.08038 43.0155 8.65208L25.354 2.29885Z" fill="currentColor" />
+            </svg>
+          </div>
+          <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">DataLabeler</h2>
+        </div>
+        <div class="flex flex-1 justify-end gap-8">
+          <div class="flex items-center gap-9">
+            <a class="text-white text-sm font-medium leading-normal" href="#">Overview</a>
+            <a class="text-white text-sm font-medium leading-normal" href="#">Features</a>
+            <a class="text-white text-sm font-medium leading-normal" href="#">Pricing</a>
+            <a class="text-white text-sm font-medium leading-normal" href="#">Contact</a>
+          </div>
+          <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#0b80ee] text-white text-sm font-bold leading-normal tracking-[0.015em]" @click="upload">
+            <span class="truncate">Upload Data</span>
+          </button>
+        </div>
+      </header>
+      <div class="px-40 flex flex-1 justify-center py-5">
+        <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+          <div class="@container">
+            <div class="@[480px]:p-4">
+              <div class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center p-4" style="background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuCsCy-C7yr2kEW5qK3QCvkZvd9sWiUVEBeTKnDyKGy_GQqy3lVpI2qRu5w-bMAoFM3GNhzt4_CEppUEcJqLBiMwuNU-3eZue-mrkkvtRe-PvZths1mFOrlA4MwEQLNXf3oNYIgNEinBWB7TDzkAa2ayNITonTs0vbrVX3jolZqmM7Sq2qECvfqE6-DhYp2eMxI-KC3RcMcgWUCjK_heMBpn8yQ3wcWpjwZTyK2XHDQOnKuCNEThnifkZIo9QAWMaEzz8LF2-40yuF8');">
+                <div class="flex flex-col gap-2 text-center">
+                  <h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">Label Time Series Data with Precision</h1>
+                  <h2 class="text-white text-sm font-normal leading-normal @[480px]:text-base">Our platform offers a streamlined solution for labeling time series data, enabling you to enhance model accuracy and gain deeper insights. Upload your data and begin labeling with ease.</h2>
+                </div>
+                <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#0b80ee] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base" @click="upload">
+                  <span class="truncate">Upload Data</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <input type="file" id="upload-file" ref="fileInput" class="hidden" @change="fileCheck" />
+          <div class="flex flex-col gap-10 px-4 py-10 @container">
+            <div class="flex flex-col gap-4">
+              <h1 class="text-white tracking-light text-[32px] font-bold leading-tight @[480px]:text-4xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] max-w-[720px]">Key Features</h1>
+              <p class="text-white text-base font-normal leading-normal max-w-[720px]">Explore the capabilities of our time series data labeling tool.</p>
+            </div>
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-0">
+              <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
+                <div class="text-white" data-icon="File" data-size="24px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"></path></svg>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <h2 class="text-white text-base font-bold leading-tight">Easy Data Upload</h2>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Seamlessly upload your time series data in various formats, including CSV and JSON.</p>
+                </div>
+              </div>
+              <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
+                <div class="text-white" data-icon="Clock" data-size="24px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"></path></svg>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <h2 class="text-white text-base font-bold leading-tight">Efficient Labeling</h2>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Label data points with precision using our intuitive interface, designed for speed and accuracy.</p>
+                </div>
+              </div>
+              <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
+                <div class="text-white" data-icon="ChartLine" data-size="24px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0v94.37L90.73,98a8,8,0,0,1,10.07-.38l58.81,44.11L218.73,90a8,8,0,1,1,10.54,12l-64,56a8,8,0,0,1-10.07.38L96.39,114.29,40,163.63V200H224A8,8,0,0,1,232,208Z"></path></svg>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <h2 class="text-white text-base font-bold leading-tight">Advanced Analytics</h2>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Gain insights into your labeled data with built-in analytics and visualization tools.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/aletell/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
+        </div>
       </div>
-      <br>
-      <div class="info">
-        <h5 class="subh">What is it?</h5>
-        TRAINSET is a graphical tool for labeling time series data. Labeling is typically used to record interesting points in time series data. For example, if you had temperature data from a sensor mounted to a stove, you could label points  that constitute cooking events. Labels could be used as-is or as a training set for machine learning algorithms. For example, TRAINSET could be used to build a training set for an algorithm that detects cooking events in temperature time series data.<br>
-        <img src="static/files/trainset.gif" alt="TRAINSET time series brushing and labeling animation" style="width:600px;height:391px;"><br><br>
-        
-        <h5 class="subh">Where did it come from?</h5>
-        TRAINSET evolved from a tool called <a href="https://github.com/geocene/sumsarizer" target="_blank">SUMSarizer</a>. SUMSarizer helps facilitate the application of ensemble machine learning tools to time series data. Most SUMSarizer users apply the tool to detect cooking events from temperature sensors called stove use monitoring systems (SUMS). SUMS are used to monitor cookstove adoption. The development of TRAINSET was funded by the NIH Clean Cooking Implementation Science Network with funding from the NIH Common Fund for Global Health. In addition to to the development of TRAINSET, NIH also supported further development of SUMSarizer. The original development of the first SUMSarizer was supported by the Center for Effective Global Action (CEGA) and Innovations for Poverty Action (IPA). SUMSarizer is an open-source R package available on <a href="https://github.com/geocene/sumsarizer" target="_blank">SUMSarizer's GitHub page</a>.<br><br>
-        
-        <h5 class="subh">Who made it?</h5>
-        TRAINSET is maintained by <a href="https://geocene.com" target="_blank">Geocene Inc.</a> with extensive contributions from Rush Kapoor, Ajay Pillarisetti, Jeremy Coyle, Skot Croshere, Marc Paré, Hamza Benkhay, and Danny Wilson.</br></br>
-      </div>
-    </template>
-  </BaseView>
+    </div>
+  </div>
 </template>
 
 <script>
-const { DateTime } = require("luxon");
-const strftime = require('strftime');
+const { DateTime } = require('luxon');
 
 export default {
   name: 'index',
-  data: function() {
+  data () {
     return {
       errorUpload: false
-    }
+    };
   },
   props: {
     nextUp: Boolean
   },
   methods: {
-    // push Labeler.vue invalid landing
-    error() {
+    error () {
       this.errorUpload = true;
       this.$router.push({
         name: 'labeler',
         params: {
           csvData: [],
           minMax: [],
-          filename: "",
-          headerStr: "",
+          filename: '',
+          headerStr: '',
           isValid: false
         }
       });
     },
-    // trigger file upload
-    shouldUpload() {
+    shouldUpload () {
       if (this.nextUp === true) {
         setTimeout(() => this.upload(), 100);
       }
@@ -61,92 +116,55 @@ export default {
     upload () {
       this.$refs.fileInput.click();
     },
-    // check format validity of csv
     fileCheck () {
       window.onerror = (errorMsg, url, lineNumber) => {
         this.error();
-      }
-      var fileInput = document.getElementById("upload-file").files.item(0), fileText;
-      var filename = fileInput.name.split('.csv')[0];
-      var id = 0;
-      var reader = new FileReader();
-      var seriesList = new Set(), labelList = new Set(), plotDict = [], headerStr;
-      reader.readAsBinaryString(fileInput);
+      };
+      const fileInput = document.getElementById('upload-file').files.item(0);
+      const filename = fileInput.name.split('.csv')[0];
+      const reader = new FileReader();
+      const seriesList = new Set();
+      const labelList = new Set();
+      const plotDict = [];
+      let headerStr;
+      reader.readAsText(fileInput);
       reader.onloadend = () => {
-        fileText = $.csv.toArrays(reader.result);
-        headerStr = fileText[0].toString();
-        for (var i = 1; i < fileText.length ; i++) {
-          var dateMatches = fileText[i][1].match(/^((\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})(.(\d{3}))?(([+-](\d{2})\:?(\d{2}))|Z))$/)
-          var labelMatches = fileText[i][3].match(/^[a-zA-Z0-9_-]{0,16}$/)
-          var parsedValue = Number(fileText[i][2]).toString()
-          if (fileText[i].length === 4 
-            && dateMatches
-            && labelMatches
-            && parsedValue !== Number.NaN) {
-            var date = DateTime.fromISO(fileText[i][1], {setZone: true});
-            var series = fileText[i][0];
-            seriesList.add(series);
-            if (fileText[i][3]) {
-              labelList.add(fileText[i][3]);
-            }
-            plotDict.push({
-              'id': id.toString(),
-              'val': parsedValue,
-              'time': date,
-              'series': series,
-              'label': fileText[i][3]
-            });
-            id++;
-          } else {
-            if (!(fileText[i].length === 4)) {
-              console.log('line parse error in line ' + (i+1));
-            } else if (!labelMatches) {
-              console.log('label parse error in line ' + (i+1));
-            } else if (parsedValue === Number.NaN) {
-              console.log('value parse error in line ' + (i+1));
-            } else {
-              console.log('date parse error in line ' + (i+1));
-            }
-            this.error();
-            break;
-          }
-        }
-        // if there was no error parsing csv
+        headerStr = reader.result.split(/\r?\n/)[0];
+        const parseCsv = require('@/utils/parseCsv');
+        const parsed = parseCsv(reader.result);
+        parsed.forEach((row, idx) => {
+          const date = DateTime.fromJSDate(row.timestamp);
+          seriesList.add(row.series);
+          if (row.label) labelList.add(row.label);
+          plotDict.push({
+            id: idx.toString(),
+            val: row.value.toString(),
+            time: date,
+            series: row.series,
+            label: row.label
+          });
+        });
         if (!this.errorUpload) {
-          seriesList = Array.from(seriesList);
-          labelList = Array.from(labelList);
-
           this.$router.push({
             name: 'labeler',
             params: {
               csvData: plotDict,
               filename: filename,
               headerStr: headerStr,
-              seriesList: seriesList,
-              labelList: labelList,
+              seriesList: Array.from(seriesList),
+              labelList: Array.from(labelList),
               isValid: true
             }
           });
         }
-      }
+      };
     }
   },
-  created() {
+  created () {
     this.shouldUpload();
   }
 };
 </script>
 
 <style scoped>
-#upload { margin-top: 20px; border-width: 3px; border-color: #7E4C64; color: #7E4C64; padding: 15px 60px; }
-#upload:hover {  background: #7E4C64; color: #f4f4f4; }
-#upload-file { display: none; }
-.subh { font-weight: 900 !important; }
-#sampleCSV {
-  display: block;
-  padding-top: 10px;
-  padding-bottom: 5px;
-  margin-left: 40%;
-  margin-right: 40%;
-}
 </style>
