@@ -127,6 +127,7 @@ export default {
       const labelList = new Set();
       const plotDict = [];
       let headerStr;
+
       reader.readAsText(fileInput);
       reader.onloadend = () => {
         headerStr = reader.result.split(/\r?\n/)[0];
