@@ -139,6 +139,35 @@ export function drawLabeler(plottingApp) {
   plottingApp.axisBounds = {},
   plottingApp.hoverinfo = {};
 
+  const LOCAL_KEY = 'trainset_labels';
+
+  function loadSaved(){
+    const ls = localStorage.getItem(LOCAL_KEY);
+    if(ls){
+      try{
+        const arr = JSON.parse(ls);
+        if(Array.isArray(arr) && arr.length === plottingApp.csvData.length){
+          arr.forEach((v,i)=>{ plottingApp.csvData[i].label = v; });
+        }
+      }catch(e){}
+    }
+    return fetch('/annotations')
+      .then(r=>r.json())
+      .then(arr=>{
+        if(Array.isArray(arr) && arr.length === plottingApp.csvData.length){
+          arr.forEach((v,i)=>{ plottingApp.csvData[i].label = v; });
+        }
+      }).catch(()=>{});
+  }
+
+  function saveLabels(){
+    const arr = plottingApp.allData.map(d=>d.label);
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(arr));
+    fetch('/annotations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(arr)}).catch(()=>{});
+  }
+
+  window.addEventListener('beforeunload', saveLabels);
+
   $(function () {
    init();
   });
@@ -146,6 +175,7 @@ export function drawLabeler(plottingApp) {
   /* initialize plots with default series data */
   function init() {
     plottingApp.allData = plottingApp.csvData.map(type);
+    loadSaved().then(updateSelection);
     plottingApp.data = plottingApp.allData.filter(d => d.series == plottingApp.selectedSeries);
 
     // get default focus
@@ -741,6 +771,7 @@ export function drawLabeler(plottingApp) {
       .attr("style", function(d) { return getPointStyle(d) });
     plottingApp.context.selectAll(".point")
       .attr("style", function(d) { return getPointStyle(d) });
+    saveLabels();
   }
 
   /* calculate default extent based on data length */

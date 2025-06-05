@@ -5,6 +5,7 @@
       <div class="navbar-nav ml-auto">
         <router-link class="nav-link" v-bind:to="'/help'">Help</router-link>
         <router-link class="nav-link" v-bind:to="'/license'">License</router-link>
+        <router-link class="nav-link" v-bind:to="'/timeline'">Demo</router-link>
       </div>
     </slot>
   </nav>
