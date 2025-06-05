@@ -165,7 +165,6 @@ export default {
       plottingApp.csvData = this.csvData;
       plottingApp.seriesList = this.seriesList;
       plottingApp.labelList = this.labelList.sort();
-      $("#maindiv").append("<div class=\"loader\"></div>");
 
       // populate selectors
       this.handleSelector();
@@ -540,23 +539,6 @@ svg {
   shape-rendering: crispEdges;
 }
 
-.loader {
-  position: fixed;
-  left: 45%;
-  right: 25%;
-  top: 25%;
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 
 .chartText {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;

@@ -13,10 +13,10 @@
         </div>
         <div class="flex flex-1 justify-end gap-8">
           <div class="flex items-center gap-9">
-            <a class="text-white text-sm font-medium leading-normal" href="#">Overview</a>
-            <a class="text-white text-sm font-medium leading-normal" href="#">Features</a>
-            <a class="text-white text-sm font-medium leading-normal" href="#">Pricing</a>
-            <a class="text-white text-sm font-medium leading-normal" href="#">Contact</a>
+            <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'home'}">Overview</router-link>
+            <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'timeline'}">Features</router-link>
+            <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'help'}">Help</router-link>
+            <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'license'}">License</router-link>
           </div>
           <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#0b80ee] text-white text-sm font-bold leading-normal tracking-[0.015em]" @click="upload">
             <span class="truncate">Upload Data</span>
