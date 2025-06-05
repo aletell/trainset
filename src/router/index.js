@@ -6,14 +6,16 @@ import Index from '@/views/Index'
 import Help from '@/views/Help'
 import Labeler from '@/views/Labeler'
 import License from '@/views/License'
+import TimelineClone from '@/views/TimelineClone'
 
 Vue.use(VueRouter);
 
 const routes = [
-	{ name: 'home', path: '/', component: Index, props: true },
-	{ name: 'help', path: '/help', component: Help },
-	{ name: 'license', path: '/license', component: License },
-	{ name: 'labeler', path: '/labeler', component: Labeler, props: true }
+        { name: 'home', path: '/', component: Index, props: true },
+        { name: 'help', path: '/help', component: Help },
+        { name: 'license', path: '/license', component: License },
+        { name: 'labeler', path: '/labeler', component: Labeler, props: true },
+        { name: 'timeline', path: '/timeline', component: TimelineClone }
 ];
 
 export default new VueRouter({
