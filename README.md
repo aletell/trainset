@@ -11,7 +11,7 @@ If you just want to use TRAINSET and don't want to mess with deploying it, head 
 
 ## Build Setup
 
-This project works with modern versions of Node.js (v10 or later). Ensure you
+This project works with modern versions of Node.js (v16 or later). Ensure you
 have an up‑to‑date Node and npm installed before running the commands below.
 
 ``` bash
@@ -52,10 +52,10 @@ before loading.
 1. Commit your changes to a Git repository (GitHub, GitLab, etc.).
 2. Create a new site on [Netlify](https://www.netlify.com/) and link it to the repository.
 3. Set **Build command** to `npm run build` and **Publish directory** to `dist`.
-4. Deploy the site. Netlify reads `netlify.toml` so all SPA routes work and the
-   bundled files are served from the `dist` folder.
-5. To preview locally install the Netlify CLI and run `npx netlify dev`.
-6. The sample functions in `netlify/functions` mirror the local Express
+4. In the **Environment variables** section set `NODE_VERSION` to `16` to avoid build errors with older webpack.
+5. Deploy the site. Netlify reads `netlify.toml` so all SPA routes work and the bundled files are served from the `dist` folder.
+6. To preview locally install the Netlify CLI and run `npx netlify dev`.
+7. The sample functions in `netlify/functions` mirror the local Express
    endpoints so label autosave and data export work when hosted on Netlify.
    Update these files to connect to your own database because Netlify's file
    system is temporary.
