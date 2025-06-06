@@ -10,9 +10,21 @@ function detectFormat(columns) {
 
 module.exports = function parseCsv(text, filename = '') {
   const trimmed = text.trim();
+
+  const lower = filename.toLowerCase();
+
+  if (lower && !lower.endsWith('.csv') && !lower.endsWith('.json')) {
+    throw new Error('Unsupported file type');
+  }
+
   // JSON input support
-  if (filename.toLowerCase().endsWith('.json') || trimmed.startsWith('{') || trimmed.startsWith('[')) {
-    const arr = JSON.parse(trimmed);
+  if (lower.endsWith('.json') || trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    let arr;
+    try {
+      arr = JSON.parse(trimmed);
+    } catch (e) {
+      throw new Error('Invalid JSON file');
+    }
     return arr.map(r => ({
       series: r.series,
       timestamp: new Date(r.timestamp),
@@ -21,7 +33,12 @@ module.exports = function parseCsv(text, filename = '') {
     }));
   }
 
-  const rows = d3.csvParse(trimmed);
+  let rows;
+  try {
+    rows = d3.csvParse(trimmed);
+  } catch (e) {
+    throw new Error('Invalid CSV format');
+  }
   const cols = rows.columns || Object.keys(rows[0] || {});
   const format = detectFormat(cols);
   const result = [];
@@ -42,7 +59,8 @@ module.exports = function parseCsv(text, filename = '') {
   const labelCols = new Set(cols.filter(c => c.toLowerCase().includes('label')));
 
   rows.forEach(r => {
-    const ts = new Date(r[tsField]);
+    const rawTs = r[tsField];
+    const ts = new Date(rawTs.replace(' ', 'T'));
     for(let i=1;i<cols.length;i++){
       const col = cols[i];
       if(labelCols.has(col)) continue;

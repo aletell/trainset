@@ -10,6 +10,8 @@
         <router-link class="nav-link" v-bind:to="'/project-management'">Manage Data</router-link>
         <router-link class="nav-link" v-bind:to="'/explore'">Explore</router-link>
 
+  display: inline-block;
+  position: static;
       </div>
     </slot>
   </nav>
