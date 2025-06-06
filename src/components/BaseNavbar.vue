@@ -9,7 +9,7 @@
         <router-link class="nav-link" v-bind:to="'/analytics'">Analytics</router-link>
         <router-link class="nav-link" v-bind:to="'/project-management'">Manage Data</router-link>
         <router-link class="nav-link" v-bind:to="'/explore'">Explore</router-link>
-        <router-link class="nav-link" :to="{ name: 'labeler' }">Upload Data</router-link>
+
       </div>
     </slot>
   </nav>

@@ -579,6 +579,11 @@ kbd {
   display: block;
 }
 
+#logo {
+  width: 100px;
+  height: auto;
+  max-height: none;
+}
 </style>
 
 <style scoped>
