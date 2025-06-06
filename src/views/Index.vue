@@ -154,8 +154,7 @@ export default {
         try {
           parsed = parseCsv(reader.result, filename);
         } catch (e) {
-          const msg = filename.toLowerCase().endsWith('.json') ? 'Invalid JSON file' : 'Invalid CSV format';
-          this.error(msg);
+          this.error(e.message);
           return;
         }
         parsed.forEach((row, idx) => {
