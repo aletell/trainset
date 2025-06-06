@@ -17,6 +17,7 @@
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'timeline'}">Features</router-link>
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'help'}">Help</router-link>
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'license'}">License</router-link>
+            <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'analytics'}">Analytics</router-link>
           </div>
           <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#0b80ee] text-white text-sm font-bold leading-normal tracking-[0.015em]" @click="upload">
             <span class="truncate">Upload Data</span>
@@ -69,7 +70,7 @@
                 </div>
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Advanced Analytics</h2>
-                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Gain insights into your labeled data with built-in analytics and visualization tools.</p>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Gain insights into your labeled data with built-in analytics and visualization tools. <router-link class="underline" :to="{name:'analytics'}">Click here</router-link> to see an example page.</p>
                 </div>
               </div>
               <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
@@ -78,7 +79,7 @@
                 </div>
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Project Management</h2>
-                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Manage multiple datasets and labeling projects.</p>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Manage multiple datasets and labeling projects. <router-link class="underline" :to="{name:'project-management'}">Click here</router-link> for an example page.</p>
                 </div>
               </div>
               <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
@@ -87,7 +88,7 @@
                 </div>
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Data Exploration</h2>
-                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Discover relationships with scatter plots and correlation tools.</p>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Discover relationships with scatter plots and correlation tools. <router-link class="underline" :to="{name:'explore'}">Click here</router-link> for an example page.</p>
                 </div>
               </div>
             </div>

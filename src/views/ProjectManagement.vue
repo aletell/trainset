@@ -17,6 +17,7 @@
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'timeline'}">Features</router-link>
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'help'}">Help</router-link>
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'license'}">License</router-link>
+            <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'analytics'}">Analytics</router-link>
           </div>
         </div>
       </header>
