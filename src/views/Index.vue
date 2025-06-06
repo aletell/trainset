@@ -74,7 +74,7 @@
               </div>
             </div>
           </div>
-          <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/aletell/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
+          <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/Geocene/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
         </div>
       </div>
     </div>
