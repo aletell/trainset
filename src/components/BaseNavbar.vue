@@ -6,6 +6,7 @@
         <router-link class="nav-link" v-bind:to="'/help'">Help</router-link>
         <router-link class="nav-link" v-bind:to="'/license'">License</router-link>
         <router-link class="nav-link" v-bind:to="'/timeline'">Demo</router-link>
+        <router-link class="nav-link" :to="{ name: 'labeler' }">Upload Data</router-link>
       </div>
     </slot>
   </nav>
@@ -26,5 +27,9 @@ export default {
 .navbar-nav { float: right; }
 .homeLink { text-decoration: none; color: inherit; }
 .homeLink:hover { text-decoration: none; color: inherit; }
-#logo { max-height: 30px !important; }
+>>> #logo {
+  width: 100px;
+  height: auto;
+  max-height: none;
+}
 </style>
