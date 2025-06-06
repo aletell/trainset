@@ -1,15 +1,27 @@
 const d3 = require('d3-dsv');
 
-function detectFormat(columns){
-  if(columns.length === 4 && columns[0].toLowerCase() === 'series' &&
-     columns[1].toLowerCase().startsWith('timestamp')){
-    return 2; // trainset format
+function detectFormat(columns) {
+  const cols = columns.map(c => c.toLowerCase());
+  if (cols.includes('series') && cols.some(c => c.startsWith('timestamp')) && cols.includes('value')) {
+    return 2; // trainset style
   }
-  return 1; // multi-column format
+  return 1; // multi-column
 }
 
-module.exports = function parseCsv(text){
-  const rows = d3.csvParse(text.trim());
+module.exports = function parseCsv(text, filename = '') {
+  const trimmed = text.trim();
+  // JSON input support
+  if (filename.toLowerCase().endsWith('.json') || trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    const arr = JSON.parse(trimmed);
+    return arr.map(r => ({
+      series: r.series,
+      timestamp: new Date(r.timestamp),
+      value: parseFloat(r.value),
+      label: r.label || ''
+    }));
+  }
+
+  const rows = d3.csvParse(trimmed);
   const cols = rows.columns || Object.keys(rows[0] || {});
   const format = detectFormat(cols);
   const result = [];

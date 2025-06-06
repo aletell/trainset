@@ -46,15 +46,16 @@ export default {
     return { errorUpload: false };
   },
   methods:{
-    error(){
+    error(msg){
       this.errorUpload = true;
-      this.$router.push({ name: 'labeler', params:{ csvData: [], minMax: [], filename: '', headerStr: '', isValid: false } });
+      this.$router.push({ name: 'labeler', params:{ csvData: [], minMax: [], filename: '', headerStr: '', isValid: false, failMessage: msg } });
     },
     upload(){ this.$refs.fileInput.click(); },
     fileCheck(){
-      window.onerror = (m,u,l)=>{ this.error(); };
+      window.onerror = () => { this.error('Invalid file'); };
       const fileInput = document.getElementById('upload-file').files.item(0);
-      const filename = fileInput.name.split('.csv')[0];
+      const filename = fileInput.name;
+      const baseName = filename.replace(/\.[^/.]+$/, '');
       const reader = new FileReader();
       const seriesList = new Set();
       const labelList = new Set();
@@ -64,7 +65,14 @@ export default {
       reader.onloadend = () => {
         headerStr = reader.result.split(/\r?\n/)[0];
         const parseCsv = require('@/utils/parseCsv');
-        const parsed = parseCsv(reader.result);
+        let parsed;
+        try {
+          parsed = parseCsv(reader.result, filename);
+        } catch(e){
+          const msg = filename.toLowerCase().endsWith('.json') ? 'Invalid JSON file' : 'Invalid CSV format';
+          this.error(msg);
+          return;
+        }
         parsed.forEach((row, idx) => {
           const date = DateTime.fromJSDate(row.timestamp);
           seriesList.add(row.series);
@@ -76,7 +84,7 @@ export default {
             name: 'labeler',
             params:{
               csvData: plotDict,
-              filename: filename,
+              filename: baseName,
               headerStr: headerStr,
               seriesList: Array.from(seriesList),
               labelList: Array.from(labelList),

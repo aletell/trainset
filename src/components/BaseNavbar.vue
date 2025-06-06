@@ -6,6 +6,9 @@
         <router-link class="nav-link" v-bind:to="'/help'">Help</router-link>
         <router-link class="nav-link" v-bind:to="'/license'">License</router-link>
         <router-link class="nav-link" v-bind:to="'/timeline'">Demo</router-link>
+        <router-link class="nav-link" v-bind:to="'/analytics'">Analytics</router-link>
+        <router-link class="nav-link" v-bind:to="'/project-management'">Manage Data</router-link>
+        <router-link class="nav-link" v-bind:to="'/explore'">Explore</router-link>
         <router-link class="nav-link" :to="{ name: 'labeler' }">Upload Data</router-link>
       </div>
     </slot>
