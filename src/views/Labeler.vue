@@ -422,8 +422,8 @@ export default {
 };
 </script>
 
-<style>
-svg {
+<style scoped>
+#plotBox svg {
   font: 10px sans-serif;
   display: block;
   position: absolute;
@@ -579,7 +579,9 @@ kbd {
 }
 
 #logo {
-  max-height: 30px;
+  width: 100px;
+  height: auto;
+  max-height: none;
 }
 </style>
 
