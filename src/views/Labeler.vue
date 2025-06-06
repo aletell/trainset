@@ -138,7 +138,8 @@ export default {
     headerStr: String,
     seriesList: Array,
     labelList: Array,
-    isValid: Boolean
+    isValid: Boolean,
+    failMessage: String
   },
   data: function() {
     return {
@@ -252,7 +253,7 @@ export default {
         openUploadFailed: function() {
           self.modal.name = "upload_failed";
           self.modal.header = "Upload Failed";
-          self.modal.failMessage = "Make sure data is in the TRAINSET format. See help.";
+          self.modal.failMessage = self.failMessage || "Make sure data is in the TRAINSET format. See help.";
           self.$refs.modalComponent.show();
         },
         openAxisFailed: function() {
@@ -423,7 +424,7 @@ export default {
 </script>
 
 <style scoped>
-#plotBox svg {
+#maindiv svg {
   font: 10px sans-serif;
   display: block;
   position: absolute;

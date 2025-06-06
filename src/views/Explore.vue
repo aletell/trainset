@@ -19,84 +19,23 @@
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'license'}">License</router-link>
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'analytics'}">Analytics</router-link>
           </div>
-          <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#0b80ee] text-white text-sm font-bold leading-normal tracking-[0.015em]" @click="upload">
-            <span class="truncate">Upload Data</span>
-          </button>
         </div>
       </header>
       <div class="px-40 flex flex-1 justify-center py-5">
         <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
           <div class="flex flex-col gap-6 px-4 py-10 text-white">
-            <h1 class="text-2xl font-bold">Interactive Demo</h1>
-            <p class="text-[#9cabba] text-base">Explore the labeling interface below. Zoom, pan and apply labels to see how it works.</p>
-            <iframe src="/timeline_clone.html" class="w-full h-[500px] border-0 rounded"></iframe>
+            <h1 class="text-2xl font-bold">Correlation &amp; Exploration</h1>
+            <p class="text-[#9cabba] text-base">Visualize scatter plots and explore your data relationships.</p>
           </div>
           <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/Geocene/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
         </div>
       </div>
     </div>
-    <input type="file" id="upload-file" ref="fileInput" class="hidden" @change="fileCheck" />
   </div>
 </template>
 
 <script>
-const { DateTime } = require('luxon');
-export default {
-  name: 'timeline-clone',
-  data(){
-    return { errorUpload: false };
-  },
-  methods:{
-    error(msg){
-      this.errorUpload = true;
-      this.$router.push({ name: 'labeler', params:{ csvData: [], minMax: [], filename: '', headerStr: '', isValid: false, failMessage: msg } });
-    },
-    upload(){ this.$refs.fileInput.click(); },
-    fileCheck(){
-      window.onerror = () => { this.error('Invalid file'); };
-      const fileInput = document.getElementById('upload-file').files.item(0);
-      const filename = fileInput.name;
-      const baseName = filename.replace(/\.[^/.]+$/, '');
-      const reader = new FileReader();
-      const seriesList = new Set();
-      const labelList = new Set();
-      const plotDict = [];
-      let headerStr;
-      reader.readAsText(fileInput);
-      reader.onloadend = () => {
-        headerStr = reader.result.split(/\r?\n/)[0];
-        const parseCsv = require('@/utils/parseCsv');
-        let parsed;
-        try {
-          parsed = parseCsv(reader.result, filename);
-        } catch(e){
-          const msg = filename.toLowerCase().endsWith('.json') ? 'Invalid JSON file' : 'Invalid CSV format';
-          this.error(msg);
-          return;
-        }
-        parsed.forEach((row, idx) => {
-          const date = DateTime.fromJSDate(row.timestamp);
-          seriesList.add(row.series);
-          if(row.label) labelList.add(row.label);
-          plotDict.push({ id: idx.toString(), val: row.value.toString(), time: date, series: row.series, label: row.label });
-        });
-        if(!this.errorUpload){
-          this.$router.push({
-            name: 'labeler',
-            params:{
-              csvData: plotDict,
-              filename: baseName,
-              headerStr: headerStr,
-              seriesList: Array.from(seriesList),
-              labelList: Array.from(labelList),
-              isValid: true
-            }
-          });
-        }
-      };
-    }
-  }
-};
+export default { name: 'explore' };
 </script>
 
 <style scoped>

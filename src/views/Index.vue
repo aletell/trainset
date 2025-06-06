@@ -17,6 +17,7 @@
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'timeline'}">Features</router-link>
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'help'}">Help</router-link>
             <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'license'}">License</router-link>
+            <router-link class="text-white text-sm font-medium leading-normal" :to="{name:'analytics'}">Analytics</router-link>
           </div>
           <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#0b80ee] text-white text-sm font-bold leading-normal tracking-[0.015em]" @click="upload">
             <span class="truncate">Upload Data</span>
@@ -69,12 +70,30 @@
                 </div>
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Advanced Analytics</h2>
-                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Gain insights into your labeled data with built-in analytics and visualization tools.</p>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Gain insights into your labeled data with built-in analytics and visualization tools. <router-link class="underline" :to="{name:'analytics'}">Click here</router-link> to see an example page.</p>
+                </div>
+              </div>
+              <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
+                <div class="text-white" data-icon="Folders" data-size="24px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M224,72H130.67L104,45.33A8,8,0,0,0,98.34,43H32A16,16,0,0,0,16,59V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V88A16,16,0,0,0,224,72ZM32,59H93.33l16,16H224V88H32Z"></path></svg>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <h2 class="text-white text-base font-bold leading-tight">Project Management</h2>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Manage multiple datasets and labeling projects. <router-link class="underline" :to="{name:'project-management'}">Click here</router-link> for an example page.</p>
+                </div>
+              </div>
+              <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
+                <div class="text-white" data-icon="ScatterPlot" data-size="24px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M36,200a12,12,0,1,1,12-12A12,12,0,0,1,36,200Zm184-96a12,12,0,1,0-12-12A12,12,0,0,0,220,104ZM92,84a12,12,0,1,0-12-12A12,12,0,0,0,92,84Zm88,120a12,12,0,1,0,12,12A12,12,0,0,0,180,204Zm-56-52a12,12,0,1,0-12-12A12,12,0,0,0,124,152Z"></path></svg>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <h2 class="text-white text-base font-bold leading-tight">Data Exploration</h2>
+                  <p class="text-[#9cabba] text-sm font-normal leading-normal">Discover relationships with scatter plots and correlation tools. <router-link class="underline" :to="{name:'explore'}">Click here</router-link> for an example page.</p>
                 </div>
               </div>
             </div>
           </div>
-          <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/aletell/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
+          <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/Geocene/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
         </div>
       </div>
     </div>
@@ -95,7 +114,7 @@ export default {
     nextUp: Boolean
   },
   methods: {
-    error () {
+    error (msg) {
       this.errorUpload = true;
       this.$router.push({
         name: 'labeler',
@@ -104,7 +123,8 @@ export default {
           minMax: [],
           filename: '',
           headerStr: '',
-          isValid: false
+          isValid: false,
+          failMessage: msg
         }
       });
     },
@@ -117,11 +137,9 @@ export default {
       this.$refs.fileInput.click();
     },
     fileCheck () {
-      window.onerror = (errorMsg, url, lineNumber) => {
-        this.error();
-      };
       const fileInput = document.getElementById('upload-file').files.item(0);
-      const filename = fileInput.name.split('.csv')[0];
+      const filename = fileInput.name;
+      const baseName = filename.replace(/\.[^/.]+$/, '');
       const reader = new FileReader();
       const seriesList = new Set();
       const labelList = new Set();
@@ -132,7 +150,14 @@ export default {
       reader.onloadend = () => {
         headerStr = reader.result.split(/\r?\n/)[0];
         const parseCsv = require('@/utils/parseCsv');
-        const parsed = parseCsv(reader.result);
+        let parsed;
+        try {
+          parsed = parseCsv(reader.result, filename);
+        } catch (e) {
+          const msg = filename.toLowerCase().endsWith('.json') ? 'Invalid JSON file' : 'Invalid CSV format';
+          this.error(msg);
+          return;
+        }
         parsed.forEach((row, idx) => {
           const date = DateTime.fromJSDate(row.timestamp);
           seriesList.add(row.series);
@@ -150,7 +175,7 @@ export default {
             name: 'labeler',
             params: {
               csvData: plotDict,
-              filename: filename,
+              filename: baseName,
               headerStr: headerStr,
               seriesList: Array.from(seriesList),
               labelList: Array.from(labelList),
