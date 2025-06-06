@@ -71,6 +71,7 @@
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Advanced Analytics</h2>
                   <p class="text-[#9cabba] text-sm font-normal leading-normal">Gain insights into your labeled data with built-in analytics and visualization tools. <router-link class="underline" :to="{name:'analytics'}">Click here</router-link> to see an example page.</p>
+                  <p class="text-[#9cabba] text-sm italic">Not yet implemented.</p>
                 </div>
               </div>
               <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
@@ -80,6 +81,7 @@
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Project Management</h2>
                   <p class="text-[#9cabba] text-sm font-normal leading-normal">Manage multiple datasets and labeling projects. <router-link class="underline" :to="{name:'project-management'}">Click here</router-link> for an example page.</p>
+                  <p class="text-[#9cabba] text-sm italic">Not yet implemented.</p>
                 </div>
               </div>
               <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
@@ -89,6 +91,7 @@
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Data Exploration</h2>
                   <p class="text-[#9cabba] text-sm font-normal leading-normal">Discover relationships with scatter plots and correlation tools. <router-link class="underline" :to="{name:'explore'}">Click here</router-link> for an example page.</p>
+                  <p class="text-[#9cabba] text-sm italic">Not yet implemented.</p>
                 </div>
               </div>
             </div>
@@ -96,6 +99,9 @@
           <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/Geocene/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
         </div>
       </div>
+    </div>
+    <div v-if="loading" class="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div class="h-12 w-12 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
     </div>
   </div>
 </template>
@@ -107,7 +113,8 @@ export default {
   name: 'index',
   data () {
     return {
-      errorUpload: false
+      errorUpload: false,
+      loading: false
     };
   },
   props: {
@@ -137,6 +144,7 @@ export default {
       this.$refs.fileInput.click();
     },
     fileCheck () {
+      this.loading = true;
       const fileInput = document.getElementById('upload-file').files.item(0);
       const filename = fileInput.name;
       const baseName = filename.replace(/\.[^/.]+$/, '');
@@ -182,6 +190,7 @@ export default {
             }
           });
         }
+        this.loading = false;
       };
     }
   },
