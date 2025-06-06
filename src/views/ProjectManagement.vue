@@ -26,6 +26,7 @@
           <div class="flex flex-col gap-6 px-4 py-10 text-white">
             <h1 class="text-2xl font-bold">Project Management</h1>
             <p class="text-[#9cabba] text-base">Organize multiple datasets and labeling projects.</p>
+            <p class="text-[#9cabba] text-base italic">Not yet implemented.</p>
           </div>
           <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/Geocene/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
         </div>
