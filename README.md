@@ -90,6 +90,5 @@ Saved labels are stored in `static/files/annotations.json` when using the server
 Uploaded files are parsed entirely in the browser. The resulting dataset is saved under the `trainset_upload` key in `localStorage` and never sent to Netlify. Refreshing or clearing browser data will remove it.
 Uploads up to **90&nbsp;MB** are supported when running locally. Larger files may slow down the browser or exceed Netlify's limits.
 
-If you want to keep the dataset online, enable the **Store dataset on Netlify** checkbox before uploading. The parsed data will be POSTed to `/.netlify/functions/upload` and written to `static/files/uploaded.json`. Because Netlify functions run on temporary storage, connect this endpoint to your own database for persistent and secure storage.
-For a free solution that integrates well with Netlify, services like **Supabase** or **Firebase** provide databases with rate-limited free tiers.
+The checkbox to "Store dataset on Netlify" is currently disabled. Online storage has not been implemented yet.
 
