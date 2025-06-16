@@ -67,6 +67,7 @@ The functions provide:
 * `/.netlify/functions/data` – serve the demo dataset with optional outlier
   clipping via `?clip=1`
 * `/.netlify/functions/export` – download the annotated CSV
+* `/.netlify/functions/upload` – save uploaded datasets when the online option is enabled
 
 With these functions in place, `timeline_clone.html` and the Vue app will POST
 to `/annotations` and fetch `/data` and `/export` for saving and loading data.
@@ -85,4 +86,10 @@ The Vue labeling page now also persists labels to `static/files/annotations.json
 Use the mouse wheel to zoom. Arrow keys pan the selection while <kbd>Shift</kbd>+Arrow resizes it.
 Press <kbd>Ctrl</kbd>+&uarr; to label the current range as occupied and <kbd>Ctrl</kbd>+&darr; for unoccupied.
 Saved labels are stored in `static/files/annotations.json` when using the server and in your browser's localStorage. Click **Export CSV** to download the annotated data. Use the **Clip outliers** checkbox to discard points more than five standard deviations from the mean and adjust the Y axis with the "Y Max" field.
+
+Uploaded files are parsed entirely in the browser. The resulting dataset is saved under the `trainset_upload` key in `localStorage` and never sent to Netlify. Refreshing or clearing browser data will remove it.
+After a successful upload the app automatically navigates to the labeling page where the dataset is loaded from `localStorage`.
+Uploads up to **90&nbsp;MB** are supported when running locally. Larger files may slow down the browser or exceed Netlify's limits.
+
+The checkbox to "Store dataset on Netlify" is currently disabled. Online storage has not been implemented yet.
 
