@@ -159,7 +159,7 @@ export default {
       const filename = fileInput.name;
       const baseName = filename.replace(/\.[^/.]+$/, '');
       if (fileInput.size > 2000000) {
-        this.error('File too large');
+        this.error('File too large (max 2 MB)');
         this.loading = false;
         return;
       }
