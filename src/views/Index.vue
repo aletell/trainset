@@ -134,11 +134,7 @@ export default {
       this.errorUpload = true;
       this.$router.push({
         name: 'labeler',
-        params: {
-          csvData: [],
-          minMax: [],
-          filename: '',
-          headerStr: '',
+        query: {
           isValid: false,
           failMessage: msg
         }
@@ -158,8 +154,9 @@ export default {
       const fileInput = document.getElementById('upload-file').files.item(0);
       const filename = fileInput.name;
       const baseName = filename.replace(/\.[^/.]+$/, '');
-      if (fileInput.size > 2000000) {
-        this.error('File too large (max 2 MB)');
+      const MAX_SIZE = 90 * 1024 * 1024; // 90 MB
+      if (fileInput.size > MAX_SIZE) {
+        this.error('File too large (max 90 MB)');
         this.loading = false;
         return;
       }
@@ -214,7 +211,7 @@ export default {
               headers: { 'Content-Type': 'application/json' }
             }).catch(() => {});
           }
-          this.$router.push({ name: 'labeler', params: { useLocal: true } });
+          this.$router.push({ name: 'labeler', query: { useLocal: '1' } });
         }
         this.loading = false;
       };
