@@ -40,6 +40,10 @@
             </div>
           </div>
           <input type="file" id="upload-file" ref="fileInput" class="hidden" @change="fileCheck" />
+          <label class="mt-2 flex items-center gap-2 text-white text-sm" for="storeOnline">
+            <input type="checkbox" id="storeOnline" v-model="storeOnline" class="h-4 w-4" />
+            Store dataset on Netlify
+          </label>
           <div class="flex flex-col gap-10 px-4 py-10 @container">
             <div class="flex flex-col gap-4">
               <h1 class="text-white tracking-light text-[32px] font-bold leading-tight @[480px]:text-4xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] max-w-[720px]">Key Features</h1>
@@ -118,7 +122,8 @@ export default {
     return {
       errorUpload: false,
       loading: false,
-      progress: 0
+      progress: 0,
+      storeOnline: false
     };
   },
   props: {
@@ -202,6 +207,13 @@ export default {
             labelList: Array.from(labelList)
           };
           localStorage.setItem('trainset_upload', JSON.stringify(payload));
+          if (this.storeOnline) {
+            fetch('/.netlify/functions/upload', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+              headers: { 'Content-Type': 'application/json' }
+            }).catch(() => {});
+          }
           this.$router.push({ name: 'labeler', params: { useLocal: true } });
         }
         this.loading = false;

@@ -36,6 +36,18 @@ app.post('/annotations', (req, res) => {
   });
 });
 
+// optional route for storing uploaded datasets when running locally
+const UPLOAD_FILE = path.join(__dirname, 'static', 'files', 'uploaded.json');
+app.post('/upload', (req, res) => {
+  fs.writeFile(UPLOAD_FILE, JSON.stringify(req.body), err => {
+    if (err) {
+      console.error(err);
+      return res.status(500).end();
+    }
+    res.json({ status: 'ok' });
+  });
+});
+
 function generateData(){
   const start = Date.parse('2019-01-01T00:00:00Z');
   const rows = [];
