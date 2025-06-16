@@ -41,8 +41,8 @@
           </div>
           <input type="file" id="upload-file" ref="fileInput" class="hidden" @change="fileCheck" />
           <label class="mt-2 flex items-center gap-2 text-white text-sm" for="storeOnline">
-            <input type="checkbox" id="storeOnline" v-model="storeOnline" class="h-4 w-4" />
-            Store dataset on Netlify
+            <input type="checkbox" id="storeOnline" disabled class="h-4 w-4" />
+            Store dataset online (coming soon)
           </label>
           <div class="flex flex-col gap-10 px-4 py-10 @container">
             <div class="flex flex-col gap-4">
@@ -114,7 +114,8 @@
 </template>
 
 <script>
-const { DateTime } = require('luxon');
+import { DateTime } from 'luxon';
+import parseCsv from '@/utils/parseCsv';
 
 export default {
   name: 'index',
@@ -124,6 +125,7 @@ export default {
       loading: false,
       progress: 0,
       storeOnline: false
+
     };
   },
   props: {
@@ -175,7 +177,6 @@ export default {
       reader.readAsText(fileInput);
       reader.onloadend = () => {
         headerStr = reader.result.split(/\r?\n/)[0];
-        const parseCsv = require('@/utils/parseCsv');
         let parsed;
         try {
           parsed = parseCsv(reader.result, filename);
@@ -204,14 +205,9 @@ export default {
             labelList: Array.from(labelList)
           };
           localStorage.setItem('trainset_upload', JSON.stringify(payload));
-          if (this.storeOnline) {
-            fetch('/.netlify/functions/upload', {
-              method: 'POST',
-              body: JSON.stringify(payload),
-              headers: { 'Content-Type': 'application/json' }
-            }).catch(() => {});
-          }
-          this.$router.push({ name: 'labeler', query: { useLocal: '1' } });
+          this.$router.push({ name: 'labeler', query: { useLocal: '1', isValid: 'false' } });
+
+
         }
         this.loading = false;
       };
