@@ -139,7 +139,8 @@ export default {
     seriesList: Array,
     labelList: Array,
     isValid: Boolean,
-    failMessage: String
+    failMessage: String,
+    useLocal: Boolean
   },
   data: function() {
     return {
@@ -160,12 +161,33 @@ export default {
     };
   },
   mounted: function() {
-    if (this.isValid) {
-      plottingApp.headerStr = this.headerStr;
-      plottingApp.filename = this.filename;
-      plottingApp.csvData = this.csvData;
-      plottingApp.seriesList = this.seriesList;
-      plottingApp.labelList = this.labelList.sort();
+    let dataOk = this.isValid;
+    let csvData = this.csvData;
+    let filename = this.filename;
+    let headerStr = this.headerStr;
+    let seriesList = this.seriesList;
+    let labelList = this.labelList;
+
+    if (!dataOk && this.useLocal) {
+      try {
+        const stored = JSON.parse(localStorage.getItem('trainset_upload') || '{}');
+        if (Array.isArray(stored.csvData)) {
+          csvData = stored.csvData;
+          filename = stored.filename || '';
+          headerStr = stored.headerStr || '';
+          seriesList = stored.seriesList || [];
+          labelList = stored.labelList || [];
+          dataOk = true;
+        }
+      } catch (e) {}
+    }
+
+    if (dataOk) {
+      plottingApp.headerStr = headerStr;
+      plottingApp.filename = filename;
+      plottingApp.csvData = csvData;
+      plottingApp.seriesList = seriesList;
+      plottingApp.labelList = labelList.sort();
 
       // populate selectors
       this.handleSelector();

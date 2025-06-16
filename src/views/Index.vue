@@ -100,8 +100,11 @@
         </div>
       </div>
     </div>
-    <div v-if="loading" class="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div class="h-12 w-12 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
+    <div v-if="loading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/50">
+      <div class="h-12 w-12 animate-spin rounded-full border-4 border-white border-t-transparent mb-2"></div>
+      <div class="w-48 bg-gray-700 rounded h-2">
+        <div class="bg-blue-500 h-full" :style="{ width: progress + '%' }"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -114,7 +117,8 @@ export default {
   data () {
     return {
       errorUpload: false,
-      loading: false
+      loading: false,
+      progress: 0
     };
   },
   props: {
@@ -145,14 +149,26 @@ export default {
     },
     fileCheck () {
       this.loading = true;
+      this.progress = 0;
       const fileInput = document.getElementById('upload-file').files.item(0);
       const filename = fileInput.name;
       const baseName = filename.replace(/\.[^/.]+$/, '');
+      if (fileInput.size > 2000000) {
+        this.error('File too large');
+        this.loading = false;
+        return;
+      }
       const reader = new FileReader();
       const seriesList = new Set();
       const labelList = new Set();
       const plotDict = [];
       let headerStr;
+
+      reader.onprogress = e => {
+        if (e.lengthComputable) {
+          this.progress = Math.round((e.loaded / e.total) * 100);
+        }
+      };
 
       reader.readAsText(fileInput);
       reader.onloadend = () => {
@@ -178,17 +194,15 @@ export default {
           });
         });
         if (!this.errorUpload) {
-          this.$router.push({
-            name: 'labeler',
-            params: {
-              csvData: plotDict,
-              filename: baseName,
-              headerStr: headerStr,
-              seriesList: Array.from(seriesList),
-              labelList: Array.from(labelList),
-              isValid: true
-            }
-          });
+          const payload = {
+            csvData: plotDict,
+            filename: baseName,
+            headerStr: headerStr,
+            seriesList: Array.from(seriesList),
+            labelList: Array.from(labelList)
+          };
+          localStorage.setItem('trainset_upload', JSON.stringify(payload));
+          this.$router.push({ name: 'labeler', params: { useLocal: true } });
         }
         this.loading = false;
       };
