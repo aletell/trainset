@@ -40,6 +40,10 @@
             </div>
           </div>
           <input type="file" id="upload-file" ref="fileInput" class="hidden" @change="fileCheck" />
+          <label class="mt-2 flex items-center gap-2 text-white text-sm" for="storeOnline">
+            <input type="checkbox" id="storeOnline" v-model="storeOnline" class="h-4 w-4" />
+            Store dataset on Netlify
+          </label>
           <div class="flex flex-col gap-10 px-4 py-10 @container">
             <div class="flex flex-col gap-4">
               <h1 class="text-white tracking-light text-[32px] font-bold leading-tight @[480px]:text-4xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] max-w-[720px]">Key Features</h1>
@@ -71,6 +75,7 @@
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Advanced Analytics</h2>
                   <p class="text-[#9cabba] text-sm font-normal leading-normal">Gain insights into your labeled data with built-in analytics and visualization tools. <router-link class="underline" :to="{name:'analytics'}">Click here</router-link> to see an example page.</p>
+                  <p class="text-[#9cabba] text-sm italic">Not yet implemented.</p>
                 </div>
               </div>
               <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
@@ -80,6 +85,7 @@
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Project Management</h2>
                   <p class="text-[#9cabba] text-sm font-normal leading-normal">Manage multiple datasets and labeling projects. <router-link class="underline" :to="{name:'project-management'}">Click here</router-link> for an example page.</p>
+                  <p class="text-[#9cabba] text-sm italic">Not yet implemented.</p>
                 </div>
               </div>
               <div class="flex flex-1 gap-3 rounded-lg border border-[#3b4854] bg-[#1b2127] p-4 flex-col">
@@ -89,12 +95,19 @@
                 <div class="flex flex-col gap-1">
                   <h2 class="text-white text-base font-bold leading-tight">Data Exploration</h2>
                   <p class="text-[#9cabba] text-sm font-normal leading-normal">Discover relationships with scatter plots and correlation tools. <router-link class="underline" :to="{name:'explore'}">Click here</router-link> for an example page.</p>
+                  <p class="text-[#9cabba] text-sm italic">Not yet implemented.</p>
                 </div>
               </div>
             </div>
           </div>
           <p class="text-[#9cabba] text-base font-normal leading-normal text-center mt-6">This project is a fork of <a href="https://github.com/Geocene/trainset" class="underline" target="_blank">TRAINSET</a>.</p>
         </div>
+      </div>
+    </div>
+    <div v-if="loading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/50">
+      <div class="h-12 w-12 animate-spin rounded-full border-4 border-white border-t-transparent mb-2"></div>
+      <div class="w-48 bg-gray-700 rounded h-2">
+        <div class="bg-blue-500 h-full" :style="{ width: progress + '%' }"></div>
       </div>
     </div>
   </div>
@@ -107,7 +120,10 @@ export default {
   name: 'index',
   data () {
     return {
-      errorUpload: false
+      errorUpload: false,
+      loading: false,
+      progress: 0,
+      storeOnline: false
     };
   },
   props: {
@@ -118,11 +134,7 @@ export default {
       this.errorUpload = true;
       this.$router.push({
         name: 'labeler',
-        params: {
-          csvData: [],
-          minMax: [],
-          filename: '',
-          headerStr: '',
+        query: {
           isValid: false,
           failMessage: msg
         }
@@ -137,14 +149,28 @@ export default {
       this.$refs.fileInput.click();
     },
     fileCheck () {
+      this.loading = true;
+      this.progress = 0;
       const fileInput = document.getElementById('upload-file').files.item(0);
       const filename = fileInput.name;
       const baseName = filename.replace(/\.[^/.]+$/, '');
+      const MAX_SIZE = 90 * 1024 * 1024; // 90 MB
+      if (fileInput.size > MAX_SIZE) {
+        this.error('File too large (max 90 MB)');
+        this.loading = false;
+        return;
+      }
       const reader = new FileReader();
       const seriesList = new Set();
       const labelList = new Set();
       const plotDict = [];
       let headerStr;
+
+      reader.onprogress = e => {
+        if (e.lengthComputable) {
+          this.progress = Math.round((e.loaded / e.total) * 100);
+        }
+      };
 
       reader.readAsText(fileInput);
       reader.onloadend = () => {
@@ -170,18 +196,24 @@ export default {
           });
         });
         if (!this.errorUpload) {
-          this.$router.push({
-            name: 'labeler',
-            params: {
-              csvData: plotDict,
-              filename: baseName,
-              headerStr: headerStr,
-              seriesList: Array.from(seriesList),
-              labelList: Array.from(labelList),
-              isValid: true
-            }
-          });
+          const payload = {
+            csvData: plotDict,
+            filename: baseName,
+            headerStr: headerStr,
+            seriesList: Array.from(seriesList),
+            labelList: Array.from(labelList)
+          };
+          localStorage.setItem('trainset_upload', JSON.stringify(payload));
+          if (this.storeOnline) {
+            fetch('/.netlify/functions/upload', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+              headers: { 'Content-Type': 'application/json' }
+            }).catch(() => {});
+          }
+          this.$router.push({ name: 'labeler', query: { useLocal: '1' } });
         }
+        this.loading = false;
       };
     }
   },
